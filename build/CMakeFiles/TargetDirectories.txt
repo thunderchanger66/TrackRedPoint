@@ -1,3 +1,0 @@
-/home/thunder/opencvtest/build/CMakeFiles/opencvtest.dir
-/home/thunder/opencvtest/build/CMakeFiles/edit_cache.dir
-/home/thunder/opencvtest/build/CMakeFiles/rebuild_cache.dir
