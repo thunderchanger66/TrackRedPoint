@@ -34,8 +34,8 @@ private:
     cv::Rect bounding_box;// 存储最大轮廓的边界框
 
     // 设置摄像头的分辨率
-    int width = frame_width;   // 设置宽度
-    int height = frame_height;   // 设置高度
+    int width = frame_width;   //设置宽度
+    int height = frame_height;   //设置高度
 
     //空返回对象
     detect_return empty_value;
