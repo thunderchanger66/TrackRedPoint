@@ -1,0 +1,16 @@
+# 忽略 CMake 生成的文件
+CMakeFiles/
+CMakeCache.txt
+Makefile
+cmake_install.cmake
+*.cmake
+
+# 忽略构建目录
+/build/
+
+# 忽略 IDE 配置文件
+.vscode/
+
+# 忽略操作系统生成的文件
+.DS_Store
+Thumbs.db
