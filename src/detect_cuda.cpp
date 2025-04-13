@@ -8,11 +8,18 @@
 
 Detect::Detect(int camera_index)
 {
-    cap.open(camera_index);
-    if (!cap.isOpened())
+    // 优先尝试 V4L2 打开摄像头（Linux 下通常更稳定）
+    if (!cap.open(camera_index, cv::CAP_V4L2))
     {
-        std::cerr << "Error: Could not open camera." << std::endl;
-        return;
+        std::cerr << "Warning: Failed to open camera with V4L2, trying default backend..." << std::endl;
+
+        // 退而求其次，使用默认方式
+        cap.open(camera_index);
+        if (!cap.isOpened())
+        {
+            std::cerr << "Error: Could not open camera with any backend." << std::endl;
+            exit(EXIT_FAILURE);
+        }
     }
 
     cap.set(cv::CAP_PROP_FRAME_WIDTH, width);   // 设置宽度
