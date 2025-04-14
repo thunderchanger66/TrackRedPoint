@@ -26,21 +26,12 @@ private:
     cv::Mat kernel;// 形态学操作的内核
     cv::Mat mask_cpu;
 
-    std::vector<std::vector<cv::Point>> contours;// 存储轮廓的向量
-
-    double max_area = 0.0;// 最大轮廓面积
-    std::vector<cv::Point> largest_contour;// 存储最大轮廓的点集
-
-    cv::Rect bounding_box;// 存储最大轮廓的边界框
-
     // 设置摄像头的分辨率
     int width = frame_width;   //设置宽度
     int height = frame_height;   //设置高度
 
     //空返回对象
     detect_return empty_value;
-    // 返回对象
-    detect_return return_value;
 
 public:
     Detect(int camera_index = 0);

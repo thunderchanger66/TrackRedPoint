@@ -38,6 +38,49 @@ Detect::Detect(int camera_index)
     empty_value.measured_center = cv::Point2f(frame_width + 1, frame_height + 1); // 初始化测量的中心点
 }
 
+//方法一
+void getPoint(detect_return& return_value, const cv::Mat& mask_cpu, bool useContours)
+{
+    std::vector<std::vector<cv::Point>> contours;
+    cv::findContours(mask_cpu, contours, cv::RETR_EXTERNAL, cv::CHAIN_APPROX_SIMPLE);
+    // Find the largest contour
+    double maxArea = 0;
+    std::vector<cv::Point> largestContour = {};
+
+    //找到最大轮廓
+    for (const auto& contour : contours)
+    {
+        double area = cv::contourArea(contour);
+        if(area > maxArea)
+        {
+            maxArea = area;
+            largestContour = contour;
+        }
+    }
+
+    cv::Rect bounding_box;// 存储最大轮廓的边界框
+    if (maxArea > 500 && !largestContour.empty())
+    {
+        bounding_box = cv::boundingRect(largestContour);
+        
+        cv::rectangle(return_value.result, bounding_box, cv::Scalar(0, 255, 0), 2);
+
+        //返回中心点
+        return_value.measured_center = cv::Point2f(bounding_box.x + bounding_box.width / 2, bounding_box.y + bounding_box.height / 2);
+    }
+
+    maxArea = 0.0; // Reset max_area for the next frame
+    contours.clear(); // Clear contours for the next frame
+    largestContour.clear();
+}
+//方法二
+void getPoint(detect_return& return_value, const cv::Mat& mask_cpu)
+{
+    cv::Moments m = cv::moments(mask_cpu, true);
+    if(m.m00 > 0)
+        return_value.measured_center = cv::Point2f(m.m10 / m.m00, m.m01 / m.m00); // 计算重心
+}
+
 detect_return Detect::detectRedColor()
 {
     cap >> frame;
@@ -65,36 +108,12 @@ detect_return Detect::detectRedColor()
     cv::morphologyEx(mask_cpu, mask_cpu, cv::MORPH_OPEN, kernel);
     cv::morphologyEx(mask_cpu, mask_cpu, cv::MORPH_CLOSE, kernel);
 
-    //查找轮廓
-    cv::findContours(mask_cpu, contours, cv::RETR_EXTERNAL, cv::CHAIN_APPROX_SIMPLE);
-
-    //找到最大轮廓
-    for (const auto& contour : contours)
-    {
-        double area = cv::contourArea(contour);
-        if(area > max_area)
-        {
-            max_area = area;
-            largest_contour = contour;
-        }
-    }
-
+    // 返回对象
+    detect_return return_value;
     //存储最大轮廓
     return_value.result = frame.clone(); // Clone the original frame for display
-    return_value.measured_center = cv::Point2f(frame_width + 1, frame_height + 1);
-    if (max_area > 500 && !largest_contour.empty())
-    {
-        bounding_box = cv::boundingRect(largest_contour);
-        
-        cv::rectangle(return_value.result, bounding_box, cv::Scalar(0, 255, 0), 2);
-
-        //返回中心点
-        return_value.measured_center = cv::Point2f(bounding_box.x + bounding_box.width / 2, bounding_box.y + bounding_box.height / 2);
-    }
-
-    max_area = 0.0; // Reset max_area for the next frame
-    contours.clear(); // Clear contours for the next frame
-    largest_contour.clear(); 
+    return_value.measured_center = cv::Point2f(frame_width + 1, frame_height + 1); 
+    getPoint(return_value, mask_cpu); // 获取最大轮廓的中心点
 
     return return_value;
 }
