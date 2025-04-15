@@ -4,6 +4,7 @@
 #include "serial_port.hpp"
 #include <sstream>
 #include "gpio.hpp"
+#include <PID.hpp>
 
 void show_FPS(cv::Mat& frame)
 {
@@ -34,6 +35,15 @@ void start_detect(int camera_index)
 
     gpiod_line* line = GPIO_init();// 初始化GPIO引脚
 
+    PID pidy(0, 0, 0);
+    // 全局变量映射到 PID 参数
+    int kp_slider = 0, ki_slider = 0, kd_slider = 0, alpha_slider = 10;
+    cv::namedWindow("PID Tuning", cv::WINDOW_AUTOSIZE);
+    cv::createTrackbar("Kp", "PID Tuning", &kp_slider, 1000);
+    cv::createTrackbar("Ki", "PID Tuning", &ki_slider, 1000);
+    cv::createTrackbar("Kd", "PID Tuning", &kd_slider, 1000);
+    cv::createTrackbar("Alpha", "PID Tuning", &alpha_slider, 100); // 0.0 ~ 1.0
+
     //最终检测结果
     detect_return final;
     while(true)
@@ -44,21 +54,25 @@ void start_detect(int camera_index)
         {
             cv::circle(final.result, final.measured_center, 5, cv::Scalar(255, 0, 0), -1); // Draw center point
             std::cout << "measured_center: (" << final.measured_center.x << ", " << final.measured_center.y << ")" << std::endl;
-    
             kalman_center = kalman_filter.get_kalman_filter(final.measured_center); // 使用卡尔曼滤波器预测中心点
             cv::circle(final.result, kalman_center, 5, cv::Scalar(0, 0, 255), -1);//红色点为卡尔曼滤波器预测的中心点
             std::cout << "kalman_center: (" << kalman_center.x << ", " << kalman_center.y << ")" << std::endl;
-
             std::cout << std::endl;
+
+            //进行PID控制
+            //kp初步测试3，即0.003
+            pidy.update(kp_slider / 1000.0f, ki_slider / 1000.0f, kd_slider / 1000.0f, alpha_slider / 100.0f);// 更新PID参数
+            cv::Point2f setpoint = cv::Point2f(frame_width / 2, frame_height / 2); // 设置目标点为图像中心
+            float outputy = pidy.compute(setpoint.y, kalman_center.y); // 计算PID输出
 
             //发送中心信息 
             std::stringstream ss;
-            ss << "C" << kalman_center.x << ", " << kalman_center.y << "\n";
+            ss << "C" << 0 << ", " << outputy << "\n";
             serial.writeData(ss.str());
         }
 
         show_FPS(final.result); // 显示FPS
-        //cv::imshow("Detected Red Color", final.result);// 显示处理后的图像
+        cv::imshow("Detected Red Color", final.result);// 显示处理后的图像
 
         if (cv::waitKey(1) == 'q') break;
     }
