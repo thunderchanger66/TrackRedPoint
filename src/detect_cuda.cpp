@@ -113,7 +113,7 @@ detect_return Detect::detectRedColor()
     //存储最大轮廓
     return_value.result = frame.clone(); // Clone the original frame for display
     return_value.measured_center = cv::Point2f(frame_width + 1, frame_height + 1); 
-    getPoint(return_value, mask_cpu); // 获取最大轮廓的中心点
+    getPoint(return_value, mask_cpu, true); // 获取最大轮廓的中心点
 
     return return_value;
 }
