@@ -12,7 +12,7 @@ public:
 
     bool isOpen() const;
 
-    int writeData(const std::string& data);
+    int writeData(const char* data, size_t size);
     int readData(char* buffer, int bufferSize);
 
 private:

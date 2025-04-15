@@ -66,9 +66,9 @@ bool SerialPort::isOpen() const {
     return fd_ != -1;
 }
 
-int SerialPort::writeData(const std::string& data) {
+int SerialPort::writeData(const char* data, size_t size) {
     if (fd_ == -1) return -1;
-    return write(fd_, data.c_str(), data.size());
+    return write(fd_, data, size);
 }
 
 int SerialPort::readData(char* buffer, int bufferSize) {

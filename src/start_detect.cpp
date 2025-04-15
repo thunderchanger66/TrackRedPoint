@@ -35,14 +35,20 @@ void start_detect(int camera_index)
 
     gpiod_line* line = GPIO_init();// 初始化GPIO引脚
 
+    PID pidx(0, 0, 0);
     PID pidy(0, 0, 0);
     // 全局变量映射到 PID 参数
-    int kp_slider = 0, ki_slider = 0, kd_slider = 0, alpha_slider = 10;
+    int kp_sliderx = 3, ki_sliderx = 0, kd_sliderx = 3, alpha_sliderx = 5;
+    int kp_slidery = 3, ki_slidery = 0, kd_slidery = 5, alpha_slidery = 5;
     cv::namedWindow("PID Tuning", cv::WINDOW_AUTOSIZE);
-    cv::createTrackbar("Kp", "PID Tuning", &kp_slider, 1000);
-    cv::createTrackbar("Ki", "PID Tuning", &ki_slider, 1000);
-    cv::createTrackbar("Kd", "PID Tuning", &kd_slider, 1000);
-    cv::createTrackbar("Alpha", "PID Tuning", &alpha_slider, 100); // 0.0 ~ 1.0
+    cv::createTrackbar("Kpx", "PID Tuning", &kp_sliderx, 1000);
+    cv::createTrackbar("Kix", "PID Tuning", &ki_sliderx, 1000);
+    cv::createTrackbar("Kdx", "PID Tuning", &kd_sliderx, 1000);
+    cv::createTrackbar("Alphax", "PID Tuning", &alpha_sliderx, 100); // 0.0 ~ 1.0
+    cv::createTrackbar("Kpy", "PID Tuning", &kp_slidery, 1000);
+    cv::createTrackbar("Kiy", "PID Tuning", &ki_slidery, 1000);
+    cv::createTrackbar("Kdy", "PID Tuning", &kd_slidery, 1000);
+    cv::createTrackbar("Alphay", "PID Tuning", &alpha_slidery, 100); // 0.0 ~ 1.0
 
     //最终检测结果
     detect_return final;
@@ -60,15 +66,22 @@ void start_detect(int camera_index)
             std::cout << std::endl;
 
             //进行PID控制
-            //kp初步测试3，即0.003
-            pidy.update(kp_slider / 1000.0f, ki_slider / 1000.0f, kd_slider / 1000.0f, alpha_slider / 100.0f);// 更新PID参数
+            pidx.update(kp_sliderx / 1000.0f, ki_sliderx / 1000.0f, kd_sliderx / 1000.0f, alpha_sliderx / 100.0f);// 更新PID参数
+            //kp初步测试3，即0.003//ki 0//kd 3//alpha 5
+            pidy.update(kp_slidery / 1000.0f, ki_slidery / 1000.0f, kd_slidery / 1000.0f, alpha_slidery / 100.0f);// 更新PID参数
             cv::Point2f setpoint = cv::Point2f(frame_width / 2, frame_height / 2); // 设置目标点为图像中心
+
+            float outputx = pidx.compute(setpoint.x, kalman_center.x); // 计算PID输出
             float outputy = pidy.compute(setpoint.y, kalman_center.y); // 计算PID输出
 
             //发送中心信息 
-            std::stringstream ss;
-            ss << "C" << 0 << ", " << outputy << "\n";
-            serial.writeData(ss.str());
+            char buffer[64];
+            int len = snprintf(buffer, sizeof(buffer), "C%.2f,%.2f\n", outputx, outputy);
+            serial.writeData(buffer, len);
+
+            // std::stringstream ss;
+            // ss << "C" << outputx << ", " << outputy << "\n";
+            // serial.writeData(ss.str());
         }
 
         show_FPS(final.result); // 显示FPS
