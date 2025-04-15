@@ -58,7 +58,7 @@ void start_detect(int camera_index)
         }
 
         show_FPS(final.result); // 显示FPS
-        cv::imshow("Detected Red Color", final.result);// 显示处理后的图像
+        //cv::imshow("Detected Red Color", final.result);// 显示处理后的图像
 
         if (cv::waitKey(1) == 'q') break;
     }

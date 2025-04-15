@@ -70,5 +70,6 @@
         "variant": "cpp",
         "csignal": "cpp",
         "any": "cpp"
-    }
+    },
+    "C_Cpp.default.compilerPath": "/usr/bin/aarch64-linux-gnu-g++"
 }
