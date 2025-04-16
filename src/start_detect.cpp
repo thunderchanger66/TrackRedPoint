@@ -71,7 +71,9 @@ void start_detect(int camera_index)
             pidx.update(kp_sliderx / 1000.0f, ki_sliderx / 1000.0f, kd_sliderx / 1000.0f, alpha_sliderx / 100.0f);// 更新PID参数
             //kp初步测试3，即0.003//ki 0//kd 3//alpha 5
             pidy.update(kp_slidery / 1000.0f, ki_slidery / 1000.0f, kd_slidery / 1000.0f, alpha_slidery / 100.0f);// 更新PID参数
-            cv::Point2f setpoint = cv::Point2f(frame_width / 2, frame_height / 2); // 设置目标点为图像中心
+            cv::Point2f setpoint = cv::Point2f(frame_width / 2, frame_height / 2); // 设置目标点为图像中心//若没有相机，则这里的目标点就是红点
+                                                                                   //而追踪的绿点就是我们的测量点，偏差就变成了红点和绿点的距离
+                                                                                   //这个还是暂时搁置，追踪的还是先将相机放在云台生
 
             float outputx = pidx.compute(setpoint.x, kalman_center.x); // 计算PID输出
             float outputy = pidy.compute(setpoint.y, kalman_center.y); // 计算PID输出
