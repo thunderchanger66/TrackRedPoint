@@ -1,7 +1,7 @@
 #include "start_detect.hpp"
 #include <chrono>
 #include "my_kalman.hpp"
-#include "serial_port.hpp"
+#include <serial_port.hpp>
 #include <sstream>
 #include "gpio.hpp"
 #include <PID.hpp>
@@ -37,6 +37,8 @@ void start_detect(int camera_index)
 
     PID pidx(0, 0, 0);
     PID pidy(0, 0, 0);
+
+    // PID参数滑动条
     // 全局变量映射到 PID 参数
     int kp_sliderx = 3, ki_sliderx = 0, kd_sliderx = 3, alpha_sliderx = 5;
     int kp_slidery = 3, ki_slidery = 0, kd_slidery = 5, alpha_slidery = 5;
@@ -76,7 +78,7 @@ void start_detect(int camera_index)
 
             //发送中心信息 
             char buffer[64];
-            int len = snprintf(buffer, sizeof(buffer), "C%.2f,%.2f\n", outputx, outputy);
+            int len = snprintf(buffer, sizeof(buffer), "C%.2f, %.2f\n", outputx, outputy);
             serial.writeData(buffer, len);
 
             // std::stringstream ss;

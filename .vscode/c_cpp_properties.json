@@ -6,7 +6,7 @@
                 "${workspaceFolder}/**",
                 "/usr/include",
                 "/usr/include/opencv4",
-                "/home/thunder/opencvtest/include",
+                "/home/thunder/greentrack/include",
                 "/usr/local/include",
                 "/usr/local/include/opencv4"
             ],
