@@ -80,10 +80,6 @@ void start_detect(int camera_index)
             char buffer[64];
             int len = snprintf(buffer, sizeof(buffer), "C%.2f, %.2f\n", outputx, outputy);
             serial.writeData(buffer, len);
-
-            // std::stringstream ss;
-            // ss << "C" << outputx << ", " << outputy << "\n";
-            // serial.writeData(ss.str());
         }
 
         show_FPS(final.result); // 显示FPS
