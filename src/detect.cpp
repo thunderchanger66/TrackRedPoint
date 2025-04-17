@@ -14,9 +14,9 @@ Detect::Detect(int camera_index)
     cap.set(cv::CAP_PROP_FRAME_WIDTH, width);   // 设置宽度
     cap.set(cv::CAP_PROP_FRAME_HEIGHT, height); // 设置高度
 
-    lower_red1 = cv::Scalar(0, 100, 100);
+    lower_red1 = cv::Scalar(0, 120, 240);
     upper_red1 = cv::Scalar(10, 255, 255);  
-    lower_red2 = cv::Scalar(160, 100, 100);
+    lower_red2 = cv::Scalar(160, 120, 240);
     upper_red2 = cv::Scalar(180, 255, 255);
 
     //kernel = cv::getStructuringElement(cv::MORPH_ELLIPSE, cv::Size(3, 3));
